@@ -678,6 +678,10 @@ char_type:
   {
     $$ = ColumnType{Type: string($1), SetValues: $3}
   }
+| BOOLEAN
+  {
+    $$ = ColumnType{Type: string($1)}
+  }
 
 enum_values:
   STRING
@@ -782,6 +786,14 @@ column_default_opt:
 | DEFAULT NULL
   {
     $$ = NewValArg($2)
+  }
+| DEFAULT boolean_value
+  {
+    s := []byte("false")
+    if $2 {
+      s = []byte("true")
+    }
+    $$ = NewValArg(s)
   }
 
 auto_increment_opt:
