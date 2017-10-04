@@ -609,6 +609,10 @@ char_type:
   {
     $$ = ColumnType{Type: string($1), Length: $2, Charset: $3, Collate: $4}
   }
+| VARCHAR length_opt BINARY charset_opt collate_opt
+  {
+    $$ = ColumnType{Type: string($1) + " " + string($3), Length: $2, Charset: $4, Collate: $5}
+  }
 | BINARY length_opt
   {
     $$ = ColumnType{Type: string($1), Length: $2}
