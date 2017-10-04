@@ -1281,6 +1281,10 @@ join_table:
   {
     $$ = &JoinTableExpr{LeftExpr: $1, Join: $2, RightExpr: $3, On: $5}
   }
+ | table_reference outer_join table_reference using_opt
+  {
+    $$ = &JoinTableExpr{LeftExpr: $1, Join: $2, RightExpr: $3}
+  }
 | table_reference natural_join table_factor
   {
     $$ = &JoinTableExpr{LeftExpr: $1, Join: $2, RightExpr: $3}
@@ -2324,6 +2328,8 @@ constraint_opt:
 using_opt:
   { $$ = struct{}{} }
 | USING sql_id
+  { $$ = struct{}{} }
+| USING '(' index_column ')'
   { $$ = struct{}{} }
 
 sql_id:
