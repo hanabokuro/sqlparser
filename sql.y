@@ -486,6 +486,15 @@ column_definition:
     $2.Comment = $7
     $$ = &ColumnDefinition{Name: NewColIdent(string($1)), Type: $2}
   }
+| ID column_type column_default_opt null_opt auto_increment_opt column_key_opt column_comment_opt
+  {
+    $2.Default = $3
+    $2.NotNull = $4
+    $2.Autoincrement = $5
+    $2.KeyOpt = $6
+    $2.Comment = $7
+    $$ = &ColumnDefinition{Name: NewColIdent(string($1)), Type: $2}
+  }
 column_type:
   numeric_type unsigned_opt zero_fill_opt
   {
