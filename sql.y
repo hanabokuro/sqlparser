@@ -836,6 +836,14 @@ index_info:
   {
     $$ = &IndexInfo{Type: string($1), Name: NewColIdent(string($2)), Unique: false}
   }
+| UNIQUE
+  {
+    $$ = &IndexInfo{Type: string($1), Name: NewColIdent("tmp"), Unique: true}
+  }
+| index_or_key
+  {
+    $$ = &IndexInfo{Type: string($1), Name: NewColIdent("tmp"), Unique: false}
+  }
 
 index_or_key:
     INDEX
