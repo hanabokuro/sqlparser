@@ -733,6 +733,9 @@ type ColumnType struct {
 	// Enum values
 	EnumValues []string
 
+	// Set values
+	SetValues []string
+
 	// Key specification
 	KeyOpt ColumnKeyOption
 }
@@ -750,6 +753,10 @@ func (ct *ColumnType) Format(buf *TrackedBuffer) {
 
 	if ct.EnumValues != nil {
 		buf.Myprintf("(%s)", strings.Join(ct.EnumValues, ", "))
+	}
+
+	if ct.SetValues != nil {
+		buf.Myprintf("(%s)", strings.Join(ct.SetValues, ", "))
 	}
 
 	opts := make([]string, 0, 16)

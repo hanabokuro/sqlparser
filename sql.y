@@ -248,7 +248,7 @@ func forceEOF(yylex interface{}) {
 %type <LengthScaleOption> float_length_opt decimal_length_opt
 %type <boolVal> null_opt auto_increment_opt
 %type <colKeyOpt> column_key_opt
-%type <strs> enum_values
+%type <strs> enum_values set_values
 %type <columnDefinition> column_definition
 %type <indexDefinition> index_definition
 %type <str> index_or_key
@@ -648,6 +648,10 @@ char_type:
   {
     $$ = ColumnType{Type: string($1), EnumValues: $3}
   }
+| SET '(' set_values ')'
+  {
+    $$ = ColumnType{Type: string($1), SetValues: $3}
+  }
 
 enum_values:
   STRING
@@ -659,6 +663,8 @@ enum_values:
   {
     $$ = append($1, "'" + string($3) + "'")
   }
+
+set_values: enum_values
 
 length_opt:
   {
