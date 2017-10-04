@@ -507,6 +507,7 @@ type DDL struct {
 	NewName       TableName
 	IfExists      bool
 	TableSpec     *TableSpec
+	Statement     *SelectStatement
 	PartitionSpec *PartitionSpec
 }
 

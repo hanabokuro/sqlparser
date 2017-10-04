@@ -442,6 +442,10 @@ create_statement:
   {
     $$ = &DDL{Action: CreateStr, NewName: $3.ToViewName()}
   }
+| CREATE OR REPLACE VIEW table_name AS select_statement
+  {
+    $$ = &DDL{Action: AlterStr, Table: $5, Statement: &$7}
+  }
 | CREATE OR REPLACE VIEW table_name ddl_force_eof
   {
     $$ = &DDL{Action: CreateStr, NewName: $5.ToViewName()}
