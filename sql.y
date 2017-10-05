@@ -45,6 +45,8 @@ func forceEOF(yylex interface{}) {
   yylex.(*Tokenizer).ForceEOF = true
 }
 
+var tmp_column_definition *ColumnDefinition
+
 %}
 
 %union {
@@ -250,6 +252,7 @@ func forceEOF(yylex interface{}) {
 %type <colKeyOpt> column_key_opt
 %type <strs> enum_values set_values
 %type <columnDefinition> column_definition
+%type <columnType> column_options
 %type <indexDefinition> index_definition
 %type <str> index_or_key
 %type <TableSpec> table_spec table_column_list
@@ -481,33 +484,43 @@ table_column_list:
   }
 
 column_definition:
-  ID column_type null_opt column_default_opt auto_increment_opt column_key_opt column_comment_opt
-  {
-    $2.NotNull = $3
-    $2.Default = $4
-    $2.Autoincrement = $5
-    $2.KeyOpt = $6
-    $2.Comment = $7
-    $$ = &ColumnDefinition{Name: NewColIdent(string($1)), Type: $2}
+  ID column_type {
+    tmp_column_definition = &ColumnDefinition{Name: NewColIdent(string($1)), Type: $2}
+  } column_options {
+    $$ = tmp_column_definition
   }
-| ID column_type null_opt column_default_opt column_key_opt auto_increment_opt column_comment_opt
+column_options:
   {
-    $2.NotNull = $3
-    $2.Default = $4
-    $2.KeyOpt = $5
-    $2.Autoincrement = $6
-    $2.Comment = $7
-    $$ = &ColumnDefinition{Name: NewColIdent(string($1)), Type: $2}
   }
-| ID column_type column_default_opt null_opt auto_increment_opt column_key_opt column_comment_opt
+| column_options null_opt
   {
-    $2.Default = $3
-    $2.NotNull = $4
-    $2.Autoincrement = $5
-    $2.KeyOpt = $6
-    $2.Comment = $7
-    $$ = &ColumnDefinition{Name: NewColIdent(string($1)), Type: $2}
+    tmp_column_definition.Type.NotNull = $2
   }
+| column_options auto_increment_opt
+  {
+    tmp_column_definition.Type.Autoincrement = $2
+  }
+| column_options column_default_opt
+  {
+    tmp_column_definition.Type.Default = $2
+  }
+| column_options column_comment_opt
+  {
+    tmp_column_definition.Type.Comment = $2
+  }
+| column_options column_key_opt
+  {
+    tmp_column_definition.Type.KeyOpt = $2
+  }
+| column_options charset_opt
+  {
+    tmp_column_definition.Type.Charset = $2
+  }
+| column_options column_key_opt
+  {
+    tmp_column_definition.Type.KeyOpt = $2
+  }
+
 column_type:
   numeric_type unsigned_opt zero_fill_opt
   {
