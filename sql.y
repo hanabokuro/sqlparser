@@ -164,7 +164,7 @@ func forceEOF(yylex interface{}) {
 %token <bytes> NAMES CHARSET
 
 // Functions
-%token <bytes> CURRENT_TIMESTAMP DATABASE CURRENT_DATE
+%token <bytes> CURRENT_TIMESTAMP DATABASE CURRENT_DATE NOW
 %token <bytes> CURRENT_TIME LOCALTIME LOCALTIMESTAMP
 %token <bytes> UTC_DATE UTC_TIME UTC_TIMESTAMP
 %token <bytes> REPLACE
@@ -794,6 +794,10 @@ column_default_opt:
       s = []byte("true")
     }
     $$ = NewValArg(s)
+  }
+| DEFAULT function_call_nonkeyword
+  {
+    $$ = NewValArg([]byte(""))
   }
 
 auto_increment_opt:
@@ -1843,6 +1847,11 @@ function_call_nonkeyword:
   {
     $$ = &FuncExpr{Name:NewColIdent("localtimestamp")}
   }
+  // NOW
+| NOW func_datetime_precision_opt
+  {
+    $$ = &FuncExpr{Name:NewColIdent("now")}
+  }
   // curdate
 | CURRENT_DATE func_datetime_precision_opt
   {
@@ -2450,6 +2459,7 @@ reserved_keyword:
 | NATURAL
 | NEXT // next should be doable as non-reserved, but is not due to the special `select next num_val` query that vitess supports
 | NOT
+| NOW
 | NULL
 | ON
 | OR

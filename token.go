@@ -223,6 +223,7 @@ var keywords = map[string]int{
 	"next":                NEXT,
 	"not":                 NOT,
 	"no_write_to_binlog":  UNUSED,
+	"now":                 NOW,
 	"null":                NULL,
 	"numeric":             NUMERIC,
 	"offset":              OFFSET,
