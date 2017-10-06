@@ -739,6 +739,9 @@ type ColumnType struct {
 
 	// Key specification
 	KeyOpt ColumnKeyOption
+
+	// ON UPDATE
+	OnUpdate *SQLVal
 }
 
 // Format returns a canonical string representation of the type and all relevant options

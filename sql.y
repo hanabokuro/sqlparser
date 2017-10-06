@@ -244,7 +244,7 @@ var tmp_column_definition *ColumnDefinition
 %type <str> show_statement_type
 %type <columnType> column_type
 %type <columnType> int_type decimal_type numeric_type time_type char_type
-%type <optVal> length_opt column_default_opt column_comment_opt
+%type <optVal> length_opt column_default_opt column_comment_opt column_on_update_opt
 %type <str> charset_opt collate_opt
 %type <boolVal> unsigned_opt zero_fill_opt
 %type <LengthScaleOption> float_length_opt decimal_length_opt
@@ -519,6 +519,10 @@ column_options:
 | column_options column_key_opt
   {
     tmp_column_definition.Type.KeyOpt = $2
+  }
+| column_options column_on_update_opt
+  {
+    tmp_column_definition.Type.OnUpdate = $2
   }
 
 column_type:
@@ -872,6 +876,15 @@ column_comment_opt:
 | COMMENT_KEYWORD STRING
   {
     $$ = NewStrVal($2)
+  }
+
+column_on_update_opt:
+  {
+    $$ = nil
+  }
+| ON UPDATE function_call_nonkeyword
+  {
+    $$ = NewValArg([]byte(""))
   }
 
 index_definition:
