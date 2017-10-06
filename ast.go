@@ -1877,25 +1877,32 @@ func (node *SQLVal) Format(buf *TrackedBuffer) {
 	}
 }
 
-// TODO FIXME Need escape value as JSON
 func (node *SQLVal) MarshalJSON() ([]byte, error) {
 	buffer := bytes.NewBufferString("{")
 	switch node.Type {
 	case StrVal:
-		buffer.WriteString(fmt.Sprintf(`"Type":"%s",`, "String"))
-		buffer.WriteString(fmt.Sprintf(`"Value":"%s"`, string(node.Val)))
+		buffer.WriteString(`"Type":"String",`)
+		s, err := json.Marshal(string(node.Val))
+		if err != nil {
+			return nil, err
+		}
+		buffer.WriteString(fmt.Sprintf(`"Value":%s`, s))
 	case IntVal, FloatVal, HexNum:
-		buffer.WriteString(fmt.Sprintf(`"Type":"%s",`, "Int"))
+		buffer.WriteString(`"Type":"Int",`)
 		buffer.WriteString(fmt.Sprintf(`"Value":"%s"`, []byte(node.Val)))
 	case HexVal:
-		buffer.WriteString(fmt.Sprintf(`"Type":"%s",`, "Hex"))
+		buffer.WriteString(`"Type":"Hex",`)
 		buffer.WriteString(fmt.Sprintf(`"Value":"X'%s'"`, []byte(node.Val)))
 	case BitVal:
-		buffer.WriteString(fmt.Sprintf(`"Type":"%s",`, "Bit"))
+		buffer.WriteString(`"Type":"Bit",`)
 		buffer.WriteString(fmt.Sprintf(`"Value":"B'%s'"`, []byte(node.Val)))
 	case ValArg:
-		buffer.WriteString(fmt.Sprintf(`"Type":"%s",`, "Val"))
-		buffer.WriteString(fmt.Sprintf(`"Value":"B'%s'"`, string(node.Val)))
+		buffer.WriteString(`"Type":"Val",`)
+		s, err := json.Marshal(string(node.Val))
+		if err != nil {
+			return nil, err
+		}
+		buffer.WriteString(fmt.Sprintf(`"Value":%s`, s))
 	default:
 		return buffer.Bytes(), fmt.Errorf("Unknown type:%d", node.Type)
 	}

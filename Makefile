@@ -14,6 +14,13 @@
 
 MAKEFLAGS = -s
 
+COMMAND=cli/sqlparser
+
+all: ${COMMAND}
+
+${COMMAND}: *.go */*.go */*/*.go
+	go build -o $@ cli/main.go
+
 sql.go: sql.y
 	goyacc -o sql.go sql.y
 	gofmt -w sql.go
