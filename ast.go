@@ -979,6 +979,7 @@ func (ii *IndexInfo) WalkSubtree(visit Visit) error {
 type IndexColumn struct {
 	Column ColIdent
 	Length *SQLVal
+	Order  string
 }
 
 // LengthScaleOption is used for types that have an optional length
