@@ -1877,6 +1877,32 @@ func (node *SQLVal) Format(buf *TrackedBuffer) {
 	}
 }
 
+// TODO FIXME Need escape value as JSON
+func (node *SQLVal) MarshalJSON() ([]byte, error) {
+	buffer := bytes.NewBufferString("{")
+	switch node.Type {
+	case StrVal:
+		buffer.WriteString(fmt.Sprintf(`"Type":"%s",`, "String"))
+		buffer.WriteString(fmt.Sprintf(`"Value":"%s"`, string(node.Val)))
+	case IntVal, FloatVal, HexNum:
+		buffer.WriteString(fmt.Sprintf(`"Type":"%s",`, "Int"))
+		buffer.WriteString(fmt.Sprintf(`"Value":"%s"`, []byte(node.Val)))
+	case HexVal:
+		buffer.WriteString(fmt.Sprintf(`"Type":"%s",`, "Hex"))
+		buffer.WriteString(fmt.Sprintf(`"Value":"X'%s'"`, []byte(node.Val)))
+	case BitVal:
+		buffer.WriteString(fmt.Sprintf(`"Type":"%s",`, "Bit"))
+		buffer.WriteString(fmt.Sprintf(`"Value":"B'%s'"`, []byte(node.Val)))
+	case ValArg:
+		buffer.WriteString(fmt.Sprintf(`"Type":"%s",`, "Val"))
+		buffer.WriteString(fmt.Sprintf(`"Value":"B'%s'"`, string(node.Val)))
+	default:
+		return buffer.Bytes(), fmt.Errorf("Unknown type:%d", node.Type)
+	}
+	buffer.WriteString("}")
+	return buffer.Bytes(), nil
+}
+
 // WalkSubtree walks the nodes of the subtree.
 func (node *SQLVal) WalkSubtree(visit Visit) error {
 	return nil
